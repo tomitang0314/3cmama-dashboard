@@ -1,0 +1,9 @@
+{
+  "name": "3CMAMA 家長",
+  "short_name": "3CMAMA",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": []
+}

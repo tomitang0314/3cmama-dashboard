@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="3CMAMA">
+<link rel="manifest" href="manifest.webmanifest">
+<title>3CMAMA 家長</title>
+<!--
+  Served verbatim by supabase/functions/dashboard (see scripts/build-dashboard.mjs):
+  this file must not contain backticks, dollar-brace placeholders or
+  backslashes. Use string concatenation in the JS below, not template literals.
+-->
+<style>
+  :root {
+    --bg: #0f172a; --card: #1e293b; --card2: #263449; --line: #334155;
+    --text: #e2e8f0; --muted: #94a3b8; --dim: #64748b;
+    --green: #34d399; --green-d: #047857; --sky: #38bdf8; --sky-d: #0369a1;
+    --rose: #fb7185; --rose-d: #9f1239; --amber: #fbbf24; --amber-d: #b45309;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.45 -apple-system, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", system-ui, sans-serif; }
+  body { padding: env(safe-area-inset-top) 0 calc(24px + env(safe-area-inset-bottom)); }
+  .wrap { max-width: 520px; margin: 0 auto; padding: 0 14px; }
+  h1 { font-size: 20px; margin: 0; }
+  h2 { font-size: 14px; color: var(--muted); margin: 0 0 10px; font-weight: 600; letter-spacing: .02em; }
+  .card { background: var(--card); border-radius: 16px; padding: 14px; margin-top: 12px; box-shadow: 0 1px 0 rgba(255,255,255,.03) inset; }
+  .row { display: flex; gap: 8px; align-items: center; }
+  .grow { flex: 1; min-width: 0; }
+  .muted { color: var(--muted); } .dim { color: var(--dim); } .small { font-size: 13px; }
+  .big { font-size: 34px; font-weight: 800; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+  .green { color: var(--green); } .sky { color: var(--sky); } .rose { color: var(--rose); } .amber { color: var(--amber); }
+  button { font: inherit; border: 0; border-radius: 12px; padding: 12px 14px; color: #fff; background: var(--card2);
+    font-weight: 700; cursor: pointer; transition: transform .05s, filter .15s; min-height: 46px; }
+  button:active { transform: scale(.97); filter: brightness(1.15); }
+  button:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+  button.green { background: var(--green-d); color: #fff; } button.sky { background: var(--sky-d); }
+  button.rose { background: var(--rose-d); } button.amber { background: var(--amber-d); }
+  button.ghost { background: transparent; color: var(--muted); font-weight: 500; padding: 8px 10px; min-height: 0; }
+  button.pill { border-radius: 999px; padding: 8px 14px; min-height: 0; font-size: 14px; }
+  button.pill.on { background: var(--green-d); }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  input, select { font: inherit; color: var(--text); background: #0b1220; border: 1px solid var(--line);
+    border-radius: 12px; padding: 12px; width: 100%; min-height: 46px; outline: none; }
+  input:focus, select:focus { border-color: var(--sky); }
+  input[type=number] { font-variant-numeric: tabular-nums; }
+  .bar { height: 10px; background: #0b1220; border-radius: 999px; overflow: hidden; }
+  .bar > i { display: block; height: 100%; background: var(--sky); border-radius: 999px; transition: width .4s; }
+  .state { font-size: 22px; font-weight: 800; }
+  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--dim); margin-right: 6px; vertical-align: 1px; }
+  .dot.ok { background: var(--green); box-shadow: 0 0 0 3px rgba(52,211,153,.2); }
+  .dot.warn { background: var(--amber); } .dot.bad { background: var(--rose); }
+  .list { display: flex; flex-direction: column; gap: 6px; }
+  .item { background: #0b1220; border-radius: 12px; padding: 10px 12px; display: flex; gap: 10px; align-items: center; }
+  .item .t { font-size: 12px; color: var(--dim); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .item .w { width: 34px; color: var(--muted); font-size: 13px; white-space: nowrap; }
+  .item .n { width: 44px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .item .r { flex: 1; min-width: 0; color: var(--muted); font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translateX(-50%);
+    background: #0b1220; border: 1px solid var(--line); color: var(--text); padding: 12px 16px; border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.5); max-width: 90vw; font-size: 15px; z-index: 50; opacity: 0; transition: opacity .2s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+  .code { font: 800 34px/1 ui-monospace, Menlo, Consolas, monospace; letter-spacing: .25em; text-align: center; padding: 14px 0 6px; color: var(--green); }
+  details > summary { cursor: pointer; list-style: none; color: var(--muted); font-size: 14px; font-weight: 600; padding: 4px 0; }
+  details > summary::-webkit-details-marker { display: none; }
+  details > summary::after { content: ' ▾'; color: var(--dim); }
+  details[open] > summary::after { content: ' ▴'; }
+  .hidden { display: none !important; }
+  .check { display: flex; gap: 8px; align-items: center; }
+  .check input { flex: 1; }
+  .sep { height: 1px; background: var(--line); margin: 12px 0; }
+  header { position: sticky; top: 0; background: rgba(15,23,42,.92); backdrop-filter: blur(10px); padding: 12px 0 8px; z-index: 10; }
+  .who { display: flex; gap: 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ LOGIN ============ -->
+  <section id="login" class="hidden">
+    <div style="padding-top: 48px; text-align: center">
+      <div style="font-size: 56px">👨‍👩‍👦</div>
+      <h1 style="font-size: 26px; margin-top: 8px">3CMAMA 家長</h1>
+      <p class="muted">從手機管兒子的電腦時間。</p>
+    </div>
+    <div class="card">
+      <h2>家庭金鑰</h2>
+      <input id="keyInput" type="password" autocomplete="off" placeholder="貼上家庭金鑰(fam_…)">
+      <p class="small dim" style="margin: 8px 0 0">金鑰只需要輸入一次,這支手機會記住。</p>
+      <h2 style="margin-top: 14px">你是</h2>
+      <div class="who">
+        <button class="pill grow" data-who="媽媽">媽媽</button>
+        <button class="pill grow" data-who="爸爸">爸爸</button>
+      </div>
+      <button id="loginBtn" class="green" style="width: 100%; margin-top: 16px" disabled>進入</button>
+      <p id="loginErr" class="rose small hidden" style="margin: 10px 0 0"></p>
+    </div>
+  </section>
+
+  <!-- ============ MAIN ============ -->
+  <section id="main" class="hidden">
+    <header>
+      <div class="row">
+        <div class="grow">
+          <h1 id="familyName">3CMAMA</h1>
+          <div class="small muted" id="freshness"><span class="dot"></span>連線中…</div>
+        </div>
+        <select id="deviceSelect" class="hidden" style="width: auto; min-width: 120px"></select>
+        <button class="ghost" id="refreshBtn" title="重新整理">⟳</button>
+      </div>
+    </header>
+
+    <!-- no device yet -->
+    <div id="noDevice" class="card hidden">
+      <h2>還沒有配對的電腦</h2>
+      <p class="muted small">按下面「產生配對碼」,再到兒子電腦的家長模式 → 「📱 手機遠端」輸入那 8 個字。</p>
+      <button class="green" id="pairBtn0" style="width: 100%">產生配對碼</button>
+      <div id="pairBox0" class="hidden"></div>
+    </div>
+
+    <div id="deviceUI" class="hidden">
+      <!-- status -->
+      <div class="card">
+        <div class="row">
+          <div class="state grow" id="stateLabel">—</div>
+          <div class="small dim" id="stateSub"></div>
+        </div>
+        <div class="sep"></div>
+        <div class="grid2">
+          <div>
+            <div class="small muted">💰 代幣存款(跨天)</div>
+            <div class="big" id="balance">—</div>
+          </div>
+          <div>
+            <div class="small muted">👀 今天還能玩</div>
+            <div class="big" id="remaining">—</div>
+          </div>
+        </div>
+        <div style="margin-top: 10px">
+          <div class="row small muted" style="justify-content: space-between"><span>今天已用</span><span id="usedText">—</span></div>
+          <div class="bar" style="margin-top: 6px"><i id="usedBar" style="width: 0%"></i></div>
+        </div>
+        <div id="ritualBox" class="hidden" style="margin-top: 12px">
+          <div class="amber small" style="margin-bottom: 8px">☀️ 今天的起床任務還沒完成,兒子拿不到代幣。</div>
+          <button class="amber" data-cmd="parent_complete_ritual" style="width: 100%">代替他完成起床任務(給滿額)</button>
+        </div>
+      </div>
+
+      <!-- actions -->
+      <div class="card">
+        <h2>💰 代幣存款(跨天有效)</h2>
+        <div class="grid">
+          <button class="green" data-cmd="grant_tokens" data-min="5">+5</button>
+          <button class="green" data-cmd="grant_tokens" data-min="10">+10</button>
+          <button class="green" data-cmd="grant_tokens" data-min="30">+30</button>
+          <button class="rose" data-cmd="grant_tokens" data-min="-10">−10</button>
+        </div>
+        <h2 style="margin-top: 14px">👀 今日上限(只有今天,3AM 歸零)</h2>
+        <div class="grid">
+          <button class="sky" data-cmd="grant_today_cap" data-min="10">+10</button>
+          <button class="sky" data-cmd="grant_today_cap" data-min="30">+30</button>
+          <button class="sky" data-cmd="grant_today_cap" data-min="60">+60</button>
+          <button class="rose" data-cmd="force_block" title="今天剩餘時間歸零">🔒 鎖住</button>
+        </div>
+        <details style="margin-top: 12px">
+          <summary>自訂數字 / 寫原因</summary>
+          <div class="row" style="margin-top: 10px">
+            <select id="customKind" style="width: 46%">
+              <option value="grant_tokens">代幣存款</option>
+              <option value="grant_today_cap">今日上限</option>
+            </select>
+            <input id="customMin" type="number" inputmode="numeric" placeholder="分鐘 (±)" style="width: 54%">
+          </div>
+          <input id="customReason" type="text" maxlength="60" placeholder="原因(例:寫完功課 / 頂嘴)" style="margin-top: 8px">
+          <button id="customSend" class="green" style="width: 100%; margin-top: 8px">送出</button>
+        </details>
+      </div>
+
+      <!-- commands -->
+      <div class="card">
+        <h2>📤 手機送出的指令</h2>
+        <div id="cmdList" class="list"><div class="dim small">還沒有</div></div>
+      </div>
+
+      <!-- audit from device -->
+      <div class="card">
+        <h2>📒 電腦上的最近紀錄</h2>
+        <div id="auditList" class="list"><div class="dim small">—</div></div>
+      </div>
+
+      <!-- checklist -->
+      <div class="card">
+        <details id="checklistDetails">
+          <summary>📝 開始玩前的確認清單</summary>
+          <p class="small muted" style="margin: 8px 0">清單不空時,兒子每次按「開始玩」前都要先打勾。清空 = 關閉。</p>
+          <div id="checklistEditor" class="list"></div>
+          <div class="row" style="margin-top: 8px">
+            <input id="checklistNew" type="text" maxlength="40" placeholder="新增一項" class="grow">
+            <button id="checklistAdd" class="pill">＋</button>
+          </div>
+          <button id="checklistSave" class="green" style="width: 100%; margin-top: 10px">存到兒子電腦</button>
+        </details>
+      </div>
+
+      <!-- schedule -->
+      <div class="card">
+        <details>
+          <summary>⚙️ 每日額度設定</summary>
+          <div class="grid3" style="margin-top: 10px">
+            <div><div class="small muted">平日/天</div><input id="schWeekday" type="number" inputmode="numeric"></div>
+            <div><div class="small muted">週六</div><input id="schSat" type="number" inputmode="numeric"></div>
+            <div><div class="small muted">週日</div><input id="schSun" type="number" inputmode="numeric"></div>
+          </div>
+          <div style="margin-top: 8px"><div class="small muted">每 30 分鐘後休息幾分鐘</div><input id="schRest" type="number" inputmode="numeric"></div>
+          <p class="small dim" style="margin: 8px 0">平日的數字是「起床任務準時完成可以拿到的代幣」,也是當天的護眼上限。</p>
+          <button id="schSave" class="green" style="width: 100%">存到兒子電腦</button>
+        </details>
+      </div>
+    </div>
+
+    <!-- devices + me -->
+    <div class="card">
+      <details>
+        <summary>📱 裝置與帳號</summary>
+        <div id="deviceList" class="list" style="margin-top: 8px"></div>
+        <button class="pill" id="pairBtn" style="margin-top: 8px">＋ 配對另一台電腦</button>
+        <div id="pairBox" class="hidden"></div>
+        <div class="sep"></div>
+        <div class="row">
+          <span class="small muted grow">我是 <b id="whoLabel"></b></span>
+          <button class="ghost" id="switchWho">換人</button>
+          <button class="ghost" id="logoutBtn">登出</button>
+        </div>
+      </details>
+    </div>
+  </section>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+(() => {
+  'use strict'
+  // The page is static-hosted (Vercel); the API is a Supabase Edge Function
+  // (CORS open, authenticated by the family key in every request). A local
+  // preview (scratch mock server) serves /parent-api next to the page instead.
+  const LOCAL = location.hostname === '127.0.0.1' || location.hostname === 'localhost'
+  const API = LOCAL
+    ? new URL('parent-api', location.href).toString()
+    : 'https://mcxquzdijnbkuymgmoux.supabase.co/functions/v1/parent-api'
+  const LS = { key: '3cmama.key', who: '3cmama.who', device: '3cmama.device' }
+  const $ = (id) => document.getElementById(id)
+  const S = {
+    key: localStorage.getItem(LS.key) || '',
+    who: localStorage.getItem(LS.who) || '',
+    deviceId: localStorage.getItem(LS.device) || '',
+    data: null, fetchedAt: 0, fastUntil: 0, timer: null, fastTimer: null, sending: false,
+    checklistDirty: false, scheduleDirty: false
+  }
+
+  // ---------- helpers ----------
+  const STATE_LABEL = {
+    USING: ['🎮 玩遊戲中', 'green'], RESTING: ['🌳 休息中', 'sky'], BLOCKED: ['🔒 已鎖住', 'rose'],
+    PAUSED: ['⏸ 暫停中', 'amber'], AWAITING_RITUAL: ['☀️ 等起床任務', 'amber'],
+    READY: ['✨ 準備好了(還沒按開始)', 'green'], ADULT_MODE: ['🔓 家長模式中', 'amber']
+  }
+  const signed = (n) => (n > 0 ? '+' : '') + n
+  const CMD_LABEL = {
+    grant_tokens: (p) => '代幣 ' + signed(p.minutes),
+    grant_today_cap: (p) => '今日上限 ' + signed(p.minutes),
+    parent_complete_ritual: () => '代完成起床任務',
+    force_block: () => '🔒 鎖住今天',
+    update_checklist: (p) => '改確認清單(' + (p.items || []).length + ' 項)',
+    set_schedule: () => '改每日額度'
+  }
+  const STATUS_ICON = { pending: '⏳', applied: '✅', failed: '❌', expired: '⌛', cancelled: '🚫' }
+  const AUDIT_LABEL = {
+    ritual_earn: '起床任務獎勵', daily_earn: '週末每日額度', parent_ritual: '家長代完成儀式', grant: '獎勵代幣',
+    deduct: '扣代幣', cap_extra: '今日加時間', checklist_confirm: '📝 確認清單', emergency_exit: '🚨 緊急解鎖', pin_change: '🔑 更改 PIN'
+  }
+  const ACTOR = { mom: '媽媽', dad: '爸爸', kid: '小孩', system: '系統' }
+  const SCHEDULE_LABEL = { weekday: '平日', saturday: '週六', sunday: '週日', restMinutes: '休息' }
+  const pad = (n) => String(n).padStart(2, '0')
+  const hhmm = (ms) => { const d = new Date(ms); return pad(d.getHours()) + ':' + pad(d.getMinutes()) }
+  const ago = (ms) => {
+    const s = Math.max(0, Math.round(ms / 1000))
+    if (s < 60) return s + ' 秒前'
+    if (s < 3600) return Math.round(s / 60) + ' 分鐘前'
+    if (s < 86400) return Math.round(s / 3600) + ' 小時前'
+    return Math.round(s / 86400) + ' 天前'
+  }
+  function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e }
+  function clear(node) { while (node.firstChild) node.removeChild(node.firstChild) }
+  let toastTimer = null
+  function toast(msg, ms) {
+    const t = $('toast'); t.textContent = msg; t.classList.add('show')
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), ms || 2600)
+  }
+  async function api(action, params) {
+    const res = await fetch(API, { method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(Object.assign({ key: S.key, action: action }, params || {})) })
+    let body = null
+    try { body = await res.json() } catch (e) { /* empty */ }
+    if (!res.ok) { const e = new Error((body && body.error) || ('HTTP ' + res.status)); e.status = res.status; throw e }
+    return body
+  }
+
+  // ---------- login ----------
+  function showLogin(err) {
+    $('login').classList.remove('hidden'); $('main').classList.add('hidden')
+    $('loginErr').classList.toggle('hidden', !err); if (err) $('loginErr').textContent = err
+    document.querySelectorAll('#login [data-who]').forEach((b) => b.classList.toggle('on', b.dataset.who === S.who))
+    $('loginBtn').disabled = !($('keyInput').value.trim().length >= 20 && S.who)
+  }
+  document.querySelectorAll('#login [data-who]').forEach((b) => b.addEventListener('click', () => {
+    S.who = b.dataset.who; localStorage.setItem(LS.who, S.who); showLogin()
+  }))
+  $('keyInput').addEventListener('input', () => showLogin())
+  $('loginBtn').addEventListener('click', async () => {
+    S.key = $('keyInput').value.trim()
+    $('loginBtn').disabled = true; $('loginBtn').textContent = '確認中…'
+    try {
+      await refresh(true)
+      localStorage.setItem(LS.key, S.key)
+      $('keyInput').value = ''
+      showMain()
+    } catch (e) {
+      showLogin(e.status === 401 ? '金鑰不對,再檢查一次(整串貼上,前面是 fam_)' : '連不上:' + e.message)
+    } finally { $('loginBtn').textContent = '進入' }
+  })
+  $('logoutBtn').addEventListener('click', () => {
+    if (!confirm('登出後要重新輸入家庭金鑰。確定?')) return
+    localStorage.removeItem(LS.key); S.key = ''; S.data = null; stopPolling(); showLogin()
+  })
+  $('switchWho').addEventListener('click', () => {
+    S.who = S.who === '媽媽' ? '爸爸' : '媽媽'; localStorage.setItem(LS.who, S.who); render()
+  })
+
+  // ---------- main ----------
+  function showMain() {
+    $('login').classList.add('hidden'); $('main').classList.remove('hidden')
+    render(); startPolling()
+  }
+  function currentDevice() {
+    const list = (S.data && S.data.devices) || []
+    return list.find((d) => d.id === S.deviceId) || list[0] || null
+  }
+  async function refresh(throwOnError) {
+    try {
+      S.data = await api('status'); S.fetchedAt = Date.now(); render()
+    } catch (e) {
+      if (throwOnError) throw e
+      if (e.status === 401) { localStorage.removeItem(LS.key); S.key = ''; stopPolling(); showLogin('金鑰已失效,請重新輸入'); return }
+      const f = $('freshness'); clear(f); f.append(el('span', 'dot bad'), '連不上伺服器:' + e.message)
+    }
+  }
+  function startPolling() {
+    stopPolling()
+    S.timer = setInterval(() => { if (document.visibilityState === 'visible') refresh() }, 8000)
+    // After sending a command poll faster for a bit so the ✅ shows up quickly.
+    S.fastTimer = setInterval(() => { if (Date.now() < S.fastUntil && document.visibilityState === 'visible') refresh() }, 3000)
+  }
+  function stopPolling() { clearInterval(S.timer); clearInterval(S.fastTimer); S.timer = null; S.fastTimer = null }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S.key) refresh() })
+  $('refreshBtn').addEventListener('click', () => refresh())
+
+  function render() {
+    const d = S.data; if (!d) return
+    $('familyName').textContent = d.family.name || '3CMAMA'
+    $('whoLabel').textContent = S.who || '?'
+    const devices = d.devices || []
+    const dev = currentDevice()
+    // device selector
+    const sel = $('deviceSelect'); clear(sel)
+    devices.forEach((x) => { const o = el('option', '', x.name); o.value = x.id; sel.append(o) })
+    sel.classList.toggle('hidden', devices.length < 2)
+    if (dev) sel.value = dev.id
+    $('noDevice').classList.toggle('hidden', !!dev)
+    $('deviceUI').classList.toggle('hidden', !dev)
+    renderDevices(devices)
+    if (!dev) { $('freshness').textContent = '請先配對兒子的電腦'; return }
+
+    // freshness
+    const seen = dev.last_seen_at ? Date.parse(dev.last_seen_at) : 0
+    const age = d.serverTime - seen
+    const f = $('freshness'); clear(f)
+    if (!seen) f.append(el('span', 'dot'), '電腦還沒回報過')
+    else if (age < 60000) f.append(el('span', 'dot ok'), '電腦連線中 · ' + ago(age) + '回報 · v' + (dev.app_version || '?'))
+    else if (age < 15 * 60000) f.append(el('span', 'dot warn'), '上次回報 ' + ago(age) + '(電腦可能休眠)')
+    else f.append(el('span', 'dot bad'), '離線 · 上次回報 ' + ago(age) + '(電腦關機或沒網路)')
+
+    const s = dev.snapshot || {}
+    const lt = STATE_LABEL[s.state] || ['—', 'muted']
+    const sl = $('stateLabel'); sl.textContent = lt[0]; sl.className = 'state grow ' + lt[1]
+    let sub = ''
+    if (s.state === 'USING') sub = '再 ' + Math.max(0, (s.sessionMinutesTarget || s.cycleUseMinutes || 0) - (s.minutesInCurrentSegment || 0)) + ' 分就休息'
+    else if (s.state === 'RESTING') {
+      const left = Math.max(0, (s.restSecondsRemaining || 0) - Math.round((d.serverTime - (s.wallClockMs || d.serverTime)) / 1000) - Math.round((Date.now() - S.fetchedAt) / 1000))
+      sub = '還要休息 ' + Math.ceil(left / 60) + ' 分'
+    } else if (s.state === 'BLOCKED') sub = s.blockReason === 'daily_cap' ? '撞到今日上限' : '代幣用完了'
+    else if (s.state === 'ADULT_MODE') sub = (ACTOR[s.adultActor] || '家長') + '在電腦前'
+    $('stateSub').textContent = sub
+
+    const bal = s.tokenBalance == null ? null : s.tokenBalance
+    $('balance').textContent = (bal == null ? '—' : bal) + ' 分'
+    $('balance').className = 'big ' + ((bal || 0) < 0 ? 'rose' : (bal || 0) < 10 ? 'amber' : 'green')
+    const rem = s.minutesRemainingToday == null ? null : s.minutesRemainingToday
+    $('remaining').textContent = (rem == null ? '—' : rem) + ' 分'
+    $('remaining').className = 'big ' + ((rem || 0) <= 0 ? 'rose' : 'sky')
+    const cap = s.effectiveDailyCap || 0, used = s.minutesUsedToday || 0
+    $('usedText').textContent = used + ' / ' + cap + ' 分' + (s.todayExtraMinutes ? '(上限已調 ' + signed(s.todayExtraMinutes) + ')' : '')
+    $('usedBar').style.width = cap ? Math.min(100, used / cap * 100) + '%' : '0%'
+    $('ritualBox').classList.toggle('hidden', !(s.ritualNeeded && !s.ritualCompleted))
+
+    // commands
+    const cl = $('cmdList'); clear(cl)
+    const cmds = (d.commands || []).filter((c) => c.device_id === dev.id).slice(0, 15)
+    if (!cmds.length) cl.append(el('div', 'dim small', '還沒有'))
+    cmds.forEach((c) => {
+      const it = el('div', 'item')
+      it.append(el('span', 't', hhmm(Date.parse(c.created_at))))
+      it.append(el('span', 'w', c.actor))
+      it.append(el('span', '', STATUS_ICON[c.status] || '•'))
+      const fn = CMD_LABEL[c.type]
+      let text = (fn ? fn(c.payload || {}) : c.type) + (c.payload && c.payload.reason ? ' · ' + c.payload.reason : '')
+      if (c.status === 'failed' && c.result && c.result.error) text += ' — ' + c.result.error
+      if (c.status === 'pending') text += ' — 等電腦收到'
+      it.append(el('span', 'r', text))
+      if (c.status === 'pending') {
+        const x = el('button', 'ghost', '取消'); x.style.padding = '2px 6px'
+        x.addEventListener('click', async () => { await api('cancel_command', { id: c.id }); toast('已取消'); refresh() })
+        it.append(x)
+      }
+      cl.append(it)
+    })
+
+    // audit
+    const al = $('auditList'); clear(al)
+    const audit = (s.recentAudit || []).slice(0, 10)
+    if (!audit.length) al.append(el('div', 'dim small', '—'))
+    audit.forEach((e) => {
+      const it = el('div', 'item')
+      it.append(el('span', 't', hhmm(e.timestamp)))
+      it.append(el('span', 'w', ACTOR[e.actor] || e.actor))
+      const zero = e.minutes === 0
+      it.append(el('span', 'n ' + (zero ? 'dim' : e.action === 'cap_extra' ? 'sky' : e.minutes > 0 ? 'green' : 'rose'), zero ? '·' : signed(e.minutes)))
+      it.append(el('span', 'r', zero ? (AUDIT_LABEL[e.action] || e.action) + ':' + (e.reason || '') : (e.reason || AUDIT_LABEL[e.action] || e.action)))
+      al.append(it)
+    })
+
+    // checklist editor — don't clobber a draft the parent is typing
+    if (!$('checklistEditor').contains(document.activeElement) && !S.checklistDirty) renderChecklist(s.preplayChecklist || [])
+    fillScheduleFromSnapshot(s)
+  }
+
+  // ---------- devices ----------
+  function renderDevices(devices) {
+    const dl = $('deviceList'); clear(dl)
+    if (!devices.length) dl.append(el('div', 'dim small', '還沒有配對的電腦'))
+    devices.forEach((x) => {
+      const it = el('div', 'item')
+      const name = el('span', 'r', x.name); name.style.color = 'var(--text)'
+      it.append(name)
+      const ren = el('button', 'ghost', '改名'); ren.style.padding = '2px 6px'
+      ren.addEventListener('click', async () => {
+        const n = prompt('這台電腦叫什麼?', x.name); if (!n || !n.trim()) return
+        await api('rename_device', { device_id: x.id, name: n.trim() }); refresh()
+      })
+      const rm = el('button', 'ghost', '移除'); rm.style.padding = '2px 6px'; rm.style.color = 'var(--rose)'
+      rm.addEventListener('click', async () => {
+        if (!confirm('移除「' + x.name + '」?電腦上的 3CMAMA 會繼續照規則跑,只是手機看不到它了,要再看得重新配對。')) return
+        await api('remove_device', { device_id: x.id }); toast('已移除'); refresh()
+      })
+      it.append(ren, rm); dl.append(it)
+    })
+  }
+  $('deviceSelect').addEventListener('change', (e) => { S.deviceId = e.target.value; localStorage.setItem(LS.device, S.deviceId); render() })
+  async function makePairCode(box) {
+    try {
+      const r = await api('create_pairing_code', { device_name: '兒子的筆電' })
+      clear(box); box.classList.remove('hidden')
+      box.append(el('div', 'code', r.code))
+      box.append(el('p', 'small muted', '到兒子電腦:家長模式 → 📱 手機遠端 → 輸入這 8 個字 → 配對。10 分鐘內有效。'))
+      S.fastUntil = Date.now() + 10 * 60000
+    } catch (e) { toast('產生失敗:' + e.message) }
+  }
+  $('pairBtn0').addEventListener('click', () => makePairCode($('pairBox0')))
+  $('pairBtn').addEventListener('click', () => makePairCode($('pairBox')))
+
+  // ---------- commands ----------
+  async function send(type, payload, confirmText) {
+    const dev = currentDevice(); if (!dev) return toast('還沒有配對的電腦')
+    if (!S.who) return toast('先選你是媽媽還是爸爸')
+    if (confirmText && !confirm(confirmText)) return
+    if (S.sending) return
+    S.sending = true
+    try {
+      await api('create_command', { device_id: dev.id, type: type, payload: payload, actor: S.who })
+      toast('已送出,電腦最多 15 秒內會收到')
+      S.fastUntil = Date.now() + 60000
+      await refresh()
+    } catch (e) { toast('送出失敗:' + e.message) } finally { S.sending = false }
+  }
+  document.querySelectorAll('[data-cmd]').forEach((b) => b.addEventListener('click', () => {
+    const type = b.dataset.cmd
+    if (type === 'force_block') return send('force_block', { reason: '' }, '把兒子今天剩下的時間歸零?(他馬上會被鎖住,想解除再按「今日上限 +N」)')
+    if (type === 'parent_complete_ritual') return send('parent_complete_ritual', {}, '代替兒子完成今天的起床任務,給他滿額代幣?')
+    const min = Number(b.dataset.min)
+    return send(type, { minutes: min, reason: '' }, min < 0 ? '扣兒子 ' + (-min) + ' 分鐘?' : null)
+  }))
+  $('customSend').addEventListener('click', () => {
+    const m = parseInt($('customMin').value, 10)
+    if (!Number.isFinite(m) || m === 0) return toast('分鐘要填非 0 的數字')
+    send($('customKind').value, { minutes: m, reason: $('customReason').value.trim() }).then(() => { $('customMin').value = ''; $('customReason').value = '' })
+  })
+
+  // ---------- checklist ----------
+  let checklistDraft = []
+  function renderChecklist(items) {
+    checklistDraft = items.map((i) => ({ id: i.id, label: i.label }))
+    drawChecklist()
+  }
+  function drawChecklist() {
+    const box = $('checklistEditor'); clear(box)
+    if (!checklistDraft.length) box.append(el('div', 'dim small', '(目前沒有項目 = 功能關閉)'))
+    checklistDraft.forEach((it, idx) => {
+      const row = el('div', 'check')
+      const inp = el('input'); inp.type = 'text'; inp.maxLength = 40; inp.value = it.label
+      inp.addEventListener('input', () => { it.label = inp.value; S.checklistDirty = true })
+      const del = el('button', 'ghost', '🗑'); del.addEventListener('click', () => { checklistDraft.splice(idx, 1); S.checklistDirty = true; drawChecklist() })
+      row.append(inp, del); box.append(row)
+    })
+  }
+  $('checklistAdd').addEventListener('click', () => {
+    const v = $('checklistNew').value.trim(); if (!v) return
+    checklistDraft.push({ id: 'k' + Date.now().toString(36), label: v }); $('checklistNew').value = ''; S.checklistDirty = true; drawChecklist()
+  })
+  $('checklistSave').addEventListener('click', async () => {
+    const items = checklistDraft.map((i) => ({ id: i.id, label: i.label.trim() })).filter((i) => i.label)
+    await send('update_checklist', { items: items }); S.checklistDirty = false
+  })
+
+  // ---------- schedule ----------
+  function fillScheduleFromSnapshot(s) {
+    // The snapshot doesn't carry the schedule table itself; show what we can
+    // infer as placeholders and leave the rest for the parent to type.
+    if (S.scheduleDirty) return
+    if (s.scheduleName === 'weekday' && !$('schWeekday').value) $('schWeekday').placeholder = String((s.effectiveDailyCap || 0) - (s.todayExtraMinutes || 0))
+    if (!$('schRest').value) $('schRest').placeholder = String(s.cycleRestMinutes || 30)
+  }
+  const SCH_IDS = ['schWeekday', 'schSat', 'schSun', 'schRest']
+  SCH_IDS.forEach((id) => $(id).addEventListener('input', () => { S.scheduleDirty = true }))
+  $('schSave').addEventListener('click', async () => {
+    const p = {}
+    const wd = parseInt($('schWeekday').value, 10), sa = parseInt($('schSat').value, 10), su = parseInt($('schSun').value, 10), rest = parseInt($('schRest').value, 10)
+    if (Number.isFinite(wd)) p.weekday = wd
+    if (Number.isFinite(sa)) p.saturday = sa
+    if (Number.isFinite(su)) p.sunday = su
+    if (Number.isFinite(rest)) p.restMinutes = rest
+    if (!Object.keys(p).length) return toast('至少填一格')
+    const summary = Object.keys(p).map((k) => SCHEDULE_LABEL[k] + ' ' + p[k]).join('、')
+    await send('set_schedule', p, '改設定:' + summary + '。確定?')
+    S.scheduleDirty = false; SCH_IDS.forEach((id) => { $(id).value = '' })
+  })
+
+  // ---------- boot ----------
+  if (S.key) {
+    showMain(); refresh()
+  } else showLogin()
+})()
+</script>
+</body>
+</html>
